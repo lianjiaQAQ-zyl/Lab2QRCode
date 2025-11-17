@@ -18,6 +18,7 @@
 #include <ZXing/ReadBarcode.h>
 #include <ZXing/DecodeHints.h>
 #include <SimpleBase64.h>
+#include <spdlog/spdlog.h>
 #include "BarcodeWidget.h"
 
 QImage BarcodeWidget::MatToQImage(const cv::Mat& mat) const
@@ -176,10 +177,10 @@ void BarcodeWidget::updateButtonStates(const QString& filePath) const
         return;
     }
 
-    QFileInfo fileInfo(filePath);
-    QString suffix = fileInfo.suffix().toLower();
+    const QFileInfo fileInfo(filePath);
+    const QString suffix = fileInfo.suffix().toLower();
 
-    QStringList imageFormats = { "png", "jpg", "jpeg", "bmp", "gif", "tiff", "webp" };
+    const QStringList imageFormats = { "png", "jpg", "jpeg", "bmp", "gif", "tiff", "webp" };
 
     if (imageFormats.contains(suffix)) {
         generateButton->setEnabled(false);
@@ -204,7 +205,7 @@ void BarcodeWidget::updateButtonStates(const QString& filePath) const
 
 void BarcodeWidget::onBrowseFile()
 {
-    QString fileName = QFileDialog::getOpenFileName(this, "Select File", "", "Supported Files (*.rfa *.png);;All Files (*)");
+    const QString fileName = QFileDialog::getOpenFileName(this, "Select File", "", "Supported Files (*.rfa *.png);;All Files (*)");
     if (!fileName.isEmpty()) {
         filePathEdit->setText(fileName);
         barcodeLabel->clear();
@@ -215,7 +216,7 @@ void BarcodeWidget::onBrowseFile()
 
 void BarcodeWidget::onGenerateClicked()
 {
-    QString filePath = filePathEdit->text();
+    const QString filePath = filePathEdit->text();
     if (filePath.isEmpty()) {
         QMessageBox::warning(this, "警告", "请选择一个文件.");
         return;
@@ -227,7 +228,7 @@ void BarcodeWidget::onGenerateClicked()
         return;
     }
 
-    QByteArray data = file.readAll();
+    const QByteArray data = file.readAll();
     file.close();
 
     try {
@@ -255,8 +256,8 @@ void BarcodeWidget::onGenerateClicked()
         lastImage = MatToQImage(img);
         barcodeLabel->clear();
         barcodeLabel->setAlignment(Qt::AlignCenter); // 重新设置居中
-        int genW = widthInput->text().toInt();
-        int genH = heightInput->text().toInt();
+        const int genW = widthInput->text().toInt();
+        const int genH = heightInput->text().toInt();
         barcodeLabel->setPixmap(QPixmap::fromImage(lastImage).scaled(genW, genH, Qt::KeepAspectRatio, Qt::SmoothTransformation));
         saveButton->setEnabled(true);
     }
@@ -267,15 +268,15 @@ void BarcodeWidget::onGenerateClicked()
 
 void BarcodeWidget::onDecodeToChemFileClicked()
 {
-    QString filePath = filePathEdit->text();
+    const QString filePath = filePathEdit->text();
     if (filePath.isEmpty()) {
         QMessageBox::warning(this, "警告", "请选择一个PNG图片文件.");
         return;
     }
 
-    QFileInfo fileInfo(filePath);
-    QString suffix = fileInfo.suffix().toLower();
-    QStringList imageFormats = { "png" };
+    const QFileInfo fileInfo(filePath);
+    const QString suffix = fileInfo.suffix().toLower();
+    const QStringList imageFormats = { "png" };
 
     if (!imageFormats.contains(suffix)) {
         QMessageBox::warning(this, "警告", "选择的文件不是PNG图片格式。\n请选择300x300像素的PNG格式图片");
@@ -283,9 +284,9 @@ void BarcodeWidget::onDecodeToChemFileClicked()
     }
 
     try {
-        cv::Mat img = cv::imread(filePath.toStdString(), cv::IMREAD_COLOR);
+        const cv::Mat img = loadImageFromFile(filePath);
         if (img.empty()) {
-            QMessageBox::critical(this, "错误", "无法加载图片文件。");
+            spdlog::error("loadImageFromFile 无法加载图片文件: {}", filePath.toStdString());
             return;
         }
 
@@ -293,8 +294,8 @@ void BarcodeWidget::onDecodeToChemFileClicked()
         cv::Mat grayImg;
         cv::cvtColor(img, grayImg, cv::COLOR_BGR2GRAY);
 
-        ZXing::ImageView imageView(grayImg.data, grayImg.cols, grayImg.rows, ZXing::ImageFormat::Lum);
-        auto result = ZXing::ReadBarcode(imageView);
+        const ZXing::ImageView imageView(grayImg.data, grayImg.cols, grayImg.rows, ZXing::ImageFormat::Lum);
+        const auto result = ZXing::ReadBarcode(imageView);
 
         if (!result.isValid()) {
             QMessageBox::warning(this, "警告", "无法识别QR码或QR码格式不正确。");
@@ -334,14 +335,14 @@ void BarcodeWidget::onDecodeToChemFileClicked()
 
 void BarcodeWidget::onSaveClicked()
 {
-    QString filePath = filePathEdit->text();
+    const QString filePath = filePathEdit->text();
     if (filePath.isEmpty()) {
         QMessageBox::warning(this, "警告", "没有可保存的内容。");
         return;
     }
 
-    QFileInfo fileInfo(filePath);
-    QString suffix = fileInfo.suffix().toLower();
+    const QFileInfo fileInfo(filePath);
+    const QString suffix = fileInfo.suffix().toLower();
 
     if (suffix == "png") {
         // 如果是PNG图片，保存解码后的文件
@@ -350,8 +351,8 @@ void BarcodeWidget::onSaveClicked()
             return;
         }
 
-        QString defaultName = fileInfo.completeBaseName() + ".rfa";
-        QString savePath = QFileDialog::getSaveFileName(this, "保存文件",
+        const QString defaultName = fileInfo.completeBaseName() + ".rfa";
+        const QString savePath = QFileDialog::getSaveFileName(this, "保存文件",
             fileInfo.dir().filePath(defaultName),
             "RFA Files (*.rfa)");
 
@@ -374,8 +375,8 @@ void BarcodeWidget::onSaveClicked()
             return;
         }
 
-        QString fileNameWithoutExtension = fileInfo.baseName();
-        QString fileName = QFileDialog::getSaveFileName(this, "保存图片",
+        const QString fileNameWithoutExtension = fileInfo.baseName();
+        const QString fileName = QFileDialog::getSaveFileName(this, "保存图片",
             fileNameWithoutExtension + ".png", "PNG Images (*.png)");
 
         if (!fileName.isEmpty()) {
@@ -449,4 +450,24 @@ ZXing::BarcodeFormat BarcodeWidget::stringToBarcodeFormat(const QString& formatS
         return it.value();
 
     return ZXing::BarcodeFormat::None; // 未匹配时返回None
+}
+
+cv::Mat BarcodeWidget::loadImageFromFile(const QString& filePath) {
+    QFile file(filePath);
+    if (!file.open(QIODevice::ReadOnly)) {
+        QMessageBox::critical(nullptr, "错误", "无法打开文件");
+        return {};
+    }
+
+    QByteArray fileData = file.readAll();
+    file.close();
+
+    cv::Mat img = cv::imdecode(cv::Mat(1, fileData.size(), CV_8UC1, fileData.data()), cv::IMREAD_COLOR);
+
+    if (img.empty()) {
+        QMessageBox::critical(nullptr, "cv::imdecode 错误", "无法解码图片文件。");
+        return cv::Mat();
+    }
+
+    return img;
 }

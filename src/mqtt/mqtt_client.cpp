@@ -41,7 +41,7 @@ void MqttSubscriber::subscribe(const std::string& topic) {
         .credentials(client_id_)
         .async_run(boost::asio::detached);
 
-    boost::mqtt5::subscribe_topic sub_topic(topic);
+    const boost::mqtt5::subscribe_topic sub_topic(topic);
 
     // 订阅主题
     client_.async_subscribe(

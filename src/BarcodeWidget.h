@@ -78,7 +78,7 @@ private slots:
     void onGenerateClicked();
 
     /**
-     * @brief 解码二维码并保存为文件。
+     * @brief 解码二维码。
      */
     void onDecodeToChemFileClicked();
 
@@ -103,6 +103,8 @@ private slots:
      */
     static ZXing::BarcodeFormat stringToBarcodeFormat(const QString& formatStr);
 
+    static cv::Mat loadImageFromFile(const QString& filePath);
+
 private:
 
     /**
@@ -121,7 +123,7 @@ private:
     QCheckBox* base64CheckBox;     /**< 是否使用base64 */
     QComboBox* formatComboBox;     /**< 条码格式选择框 */
     ZXing::BarcodeFormat currentBarcodeFormat = ZXing::BarcodeFormat::QRCode;  /**< 当前选择的条码格式  */
-    QLineEdit* widthInput;
-    QLineEdit* heightInput;
+    QLineEdit* widthInput;        /**< 图片宽度输入框  */
+    QLineEdit* heightInput;       /**< 图片高度输入框  */
     std::unique_ptr<MqttSubscriber> subscriber_;  /**< MQTT 订阅者实例  */
 };
