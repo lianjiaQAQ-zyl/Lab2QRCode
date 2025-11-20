@@ -23,7 +23,16 @@
 - [**`mqtt5`**](https://github.com/boostorg/mqtt5) - 消息订阅
 - [**`Boost.Asio`**](https://www.boost.org/doc/libs/master/doc/html/boost_asio.html)
 
-使用 Visual Studio 17 工具链构建：
+使用 Visual Studio 17 或 gcc 工具链构建：
+
+项目依赖 [`pwsh`](https://github.com/PowerShell/PowerShell/releases/tag/v7.5.4) 终端。
+
+```shell
+# windows 安装
+winget install pwsh
+```
+
+Linux 安装见[微软文档](https://learn.microsoft.com/en-us/powershell/scripting/install/install-powershell-on-linux?view=powershell-7.5)。
 
 ```cmake
 git clone https://gitee.com/Mq-b/Lab2QRCode

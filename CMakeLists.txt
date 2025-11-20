@@ -22,9 +22,7 @@ add_custom_target(RunPowerShellScript ALL
     BYPRODUCTS ${VERSION_CPP}
 )
 
-
 message(STATUS "PowerShell command: powershell -ExecutionPolicy Bypass -File ${CMAKE_SOURCE_DIR}/version_info.ps1")
-
 
 if(MSVC)
     add_compile_options(/EHsc /utf-8 /bigobj)
