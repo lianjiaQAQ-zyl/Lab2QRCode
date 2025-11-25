@@ -81,7 +81,7 @@ void MqttSubscriber::subscribe(const std::string& topic) {
     start_receive();
 
     // 在新线程中运行 io_context
-    runner_thread_ = std::thread([this]() { ioc_->run(); });
+    runner_thread_ = std::thread([this] { ioc_->run(); });
 }
 
 void MqttSubscriber::stop() {
@@ -100,7 +100,6 @@ void MqttSubscriber::start_receive() {
     client_.async_receive([this](boost::mqtt5::error_code ec, const std::string topic, const std::string payload,
                                  boost::mqtt5::publish_props props) {
         if (!ec) {
-            spdlog::info("read {} {}", topic, payload);
             callback_(topic, payload);
             // 继续接收下一条消息
             start_receive();
