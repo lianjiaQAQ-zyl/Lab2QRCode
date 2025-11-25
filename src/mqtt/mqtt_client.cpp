@@ -16,11 +16,13 @@ MqttConfig MqttSubscriber::loadMqttConfig(const std::string& filename) {
         file >> config_json;
     }
 
-    MqttConfig config;
-    config.host = config_json.value("mqtt/host", "localhost");
-    config.port = config_json.value("mqtt/port", 1883);
+    spdlog::info("MQTT 配置文件: Host={}, Port={}, Client ID={}", config_json["mqtt"]["host"].dump(), config_json["mqtt"]["port"].dump(), config_json["mqtt"]["client_id"].dump());
 
-    // 如果client_id不存在或为空，则生成并保存
+    MqttConfig config;
+    config.host = config_json["mqtt"]["host"];
+    config.port = config_json["mqtt"]["port"];
+
+    // 如果 client_id 不存在或为空，则生成并保存
     if (!config_json.contains("mqtt") ||
         !config_json["mqtt"].contains("client_id") ||
         config_json["mqtt"]["client_id"].get<std::string>().empty()) {

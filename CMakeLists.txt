@@ -63,7 +63,6 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     ${OpenCV_LIBS}
     Boost::headers
     Boost::random
-    Boost::uuid
     spdlog::spdlog_header_only
 )
 
