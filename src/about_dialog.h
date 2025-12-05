@@ -11,6 +11,11 @@ class QVBoxLayout;
 class QHBoxLayout;
 class QFrame;
 
+
+/**
+ * @class AboutDialog
+ * @brief 话框显示有关应用程序的信息
+ */
 class AboutDialog : public QDialog {
     Q_OBJECT
 
@@ -36,7 +41,7 @@ private:
     QPushButton* m_closeButton;
     QPushButton* m_githubButton;
 
-    // Version info
+    // Version information
     QString m_tag;
     QString m_hash;
     QString m_branch;

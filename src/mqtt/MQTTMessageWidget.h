@@ -12,6 +12,10 @@
 #include <QScrollBar>
 #include <QHeaderView>
 
+/**
+ * @class MQTTMessageWidget
+ * @brief 用于显示 MQTT 消息的组件
+ */
 class MQTTMessageWidget : public QWidget
 {
     Q_OBJECT

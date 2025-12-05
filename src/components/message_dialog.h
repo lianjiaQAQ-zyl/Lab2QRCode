@@ -5,6 +5,7 @@ class QLabel;
 class QPushButton;
 
 /**
+ * @class MessageDialog
  * @brief 通用消息对话框
  * 
  * 提供信息提示和更新提示功能，可以自定义按钮数量。

@@ -333,6 +333,7 @@ void CameraWidget::processFrame(cv::Mat& frame, FrameResult& out) const
 
 void CameraWidget::updateFrame(const FrameResult& r) const
 {
+    // 显示视频帧
     frameWidget->setFrame(r.frame);
 
     cameraStatusLabel->setText("摄像头运行中...");

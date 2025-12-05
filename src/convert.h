@@ -17,6 +17,10 @@
 #include <ZXing/MultiFormatWriter.h>
 #include <ZXing/ReadBarcode.h>
 
+/**
+ * @namespace convert
+ * @brief 提供二维码生成和解析的转换功能（摄像头识别与此无关）
+ */
 namespace convert{
     struct result_data_entry {
         using variant_t = std::variant<std::monostate, QImage, QByteArray, std::string>;

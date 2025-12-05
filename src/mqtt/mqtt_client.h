@@ -8,12 +8,20 @@
 #include <string>
 #include <thread>
 
+/**
+ * @struct MqttConfig
+ * @brief MQTT 配置结构体，包含连接所需的信息
+ */
 struct MqttConfig {
     std::string host;
     uint16_t port;
     std::string client_id;
 };
 
+/**
+ * @class MqttSubscriber
+ * @brief MQTT 订阅客户端，用于连接 MQTT 代理并接收消息
+ */
 class MqttSubscriber {
 public:
     using client_type = boost::mqtt5::mqtt_client<boost::asio::ip::tcp::socket>;

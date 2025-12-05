@@ -2,17 +2,30 @@
 #include <QWidget>
 #include <opencv2/core.hpp>
 
+
+/**
+ * @class FrameWidget
+ * @brief 用于显示视频帧的自定义 QWidget
+ */
 class FrameWidget : public QWidget {
     Q_OBJECT
 public:
     explicit FrameWidget(QWidget *parent = nullptr);
 
-    // 接受外部 Mat（必须是 BGR888）
-    // 注意：函数内部会复制 Mat 数据（安全方式）
+    /**
+     * @brief 设置要显示的图像帧
+     *  会自动触发重绘事件
+     * @param bgr 输入的 BGR 格式图像
+     */
     void setFrame(const cv::Mat &bgr);
     
     void clear();
 protected:
+    /**
+     * @brief 重写绘制事件以显示视频帧
+     * 
+     * @param event 绘制事件
+     */
     void paintEvent(QPaintEvent *event) override;
 
 private:
