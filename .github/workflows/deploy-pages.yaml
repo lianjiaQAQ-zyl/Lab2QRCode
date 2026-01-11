@@ -1,0 +1,60 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - master  # 当推送到 master 分支时触发
+  workflow_dispatch:  # 允许手动触发
+
+# 设置 GITHUB_TOKEN 的权限
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# 只允许一个并发部署，跳过正在运行和最新队列之间的运行
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  # 构建和部署任务
+  build-and-deploy:
+    name: Build and Deploy to GitHub Pages
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout qr-code-buddy repository
+        uses: actions/checkout@v4
+        with:
+          repository: Mq-b/qr-code-buddy  # 检出介绍页仓库
+          path: qr-code-buddy
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'  # 使用 Node.js 20
+          cache: 'npm'
+          cache-dependency-path: qr-code-buddy/package-lock.json
+
+      - name: Install dependencies
+        working-directory: qr-code-buddy
+        run: npm ci
+
+      - name: Build static site
+        working-directory: qr-code-buddy
+        run: npm run build
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: qr-code-buddy/dist  # 上传构建产物目录
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
