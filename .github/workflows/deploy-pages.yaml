@@ -6,74 +6,34 @@ on:
       - master  # 当推送到 master 分支时触发
   workflow_dispatch:  # 允许手动触发
 
-# 设置 GITHUB_TOKEN 的权限
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-# 只允许一个并发部署，跳过正在运行和最新队列之间的运行
-concurrency:
-  group: "pages"
-  cancel-in-progress: false
-
 jobs:
-  # 构建和部署任务
   build-and-deploy:
     name: Build and Deploy to GitHub Pages
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout qr-code-buddy repository
         uses: actions/checkout@v4
         with:
           repository: Mq-b/qr-code-buddy  # 检出介绍页仓库
-          path: qr-code-buddy
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'  # 使用 Node.js 20
+          node-version: '20'
           cache: 'npm'
-          cache-dependency-path: qr-code-buddy/package-lock.json
 
       - name: Install dependencies
-        working-directory: qr-code-buddy
         run: npm ci
 
       - name: Build static site
-        working-directory: qr-code-buddy
-        run: npm run build -- --base=/Lab2QRCode/
+        run: npm run build
 
-      - name: Debug - List build output
-        working-directory: qr-code-buddy
-        run: |
-          echo "=== Listing all directories ==="
-          ls -la
-          echo "=== Checking for common build directories ==="
-          if [ -d "dist" ]; then
-            echo "✅ dist directory exists"
-            ls -la dist/
-          fi
-          if [ -d "build" ]; then
-            echo "✅ build directory exists"
-            ls -la build/
-          fi
-          if [ -d ".vitepress/dist" ]; then
-            echo "✅ .vitepress/dist directory exists"
-            ls -la .vitepress/dist/
-          fi
-
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+      - name: Deploy to gh-pages branch
+        uses: crazy-max/ghaction-github-pages@v4
         with:
-          path: qr-code-buddy/dist  # 上传构建产物目录
-
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+          target_branch: gh-pages  # 部署到 gh-pages 分支
+          build_dir: dist  # 构建输出目录
+          repo: Mq-b/Lab2QRCode  # 部署到 Lab2QRCode 仓库
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}  # 个人访问令牌
